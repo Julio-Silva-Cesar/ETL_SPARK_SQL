@@ -56,6 +56,8 @@ dbutils.library.restartPython()
   
 ## 🌐 Integração com Google Sheets
 
+**1 - Instalação de dependências globais e autenticação**
+
 ```bash
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.comauth/drive"]
@@ -68,7 +70,7 @@ client = gspread.authorize(credentials)
 * Autenticação via conta de serviço do google drive para manioulação das planilhas
 * Criação do cliente via objeto de credencial gerado pelo uso de arquivo JSON da conta de serviço.
   
-**Após a integração o código abaixo:**
+**2 - Após a integração o código abaixo**
 
 * Acessa a planilha pelo ID definido no parâmetro open_by_key
 * Seleciona a aba específica
@@ -79,7 +81,7 @@ spreadsheet = client.open_by_key('ID_PLANILHA')
 worksheet = spreadsheet.worksheet("nome_aba_planilha")
 ss = pd.DataFrame(worksheet.get_all_records())
 ```
-**Encaminhamento da tabela para o Delta Lake Catalog/Databricks via spark**
+**3 - Encaminhamento da tabela para o Delta Lake Catalog/Databricks via spark**
 ```bash
 spark.createDataFrame(ss).write.format("delta")
     .mode("overwrite")
