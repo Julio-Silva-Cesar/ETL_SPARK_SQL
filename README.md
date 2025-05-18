@@ -47,4 +47,47 @@ unidecode numpy datetime packaging==23.2 -q
 dbutils.library.restartPython()
 
 ```
-## ⌛ Em DEV
+**Finalidade das bibliotecas**
+* Realiza as Autenticações Google/bigquery (OAuth2)
+* Manipulação de planilhas (gspread)
+* Integração BigQuery (pandas_gbq)
+* Processamento de dados (Pandas/NumPy)
+* Reinicialização do ambiente Python
+  
+## 🌐 Integração com Google Sheets
+
+```bash
+
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.comauth/drive"]
+SERVICE_ACCOUNT_FILE = '/Workspace/Users/.../gsa_dados_drive.json'
+credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+client = gspread.authorize(credentials)
+
+```
+* Os SCOPES definem as permissões de leitura/escrita que serão utilizadas para acessar o ambiente google
+* Autenticação via conta de serviço do google drive para manioulação das planilhas
+* Criação do cliente via objeto de credencial gerado pelo uso de arquivo JSON da conta de serviço.
+  
+**Após a integração o código abaixo:**
+
+* Acessa a planilha pelo ID definido no parâmetro open_by_key
+* Seleciona a aba específica
+* Converte os dados para DataFrame Pandas
+
+```bash
+spreadsheet = client.open_by_key('ID_PLANILHA')
+worksheet = spreadsheet.worksheet("nome_aba_planilha")
+ss = pd.DataFrame(worksheet.get_all_records())
+```
+**Encaminhamento da tabela para o Delta Lake Catalog/Databricks via spark**
+```bash
+spark.createDataFrame(ss).write.format("delta")
+    .mode("overwrite")
+    .saveAsTable("database.schema.depara_itens")
+```
+* Cria tabela Delta Lake versionada
+* Estrutura: database.schema.table_name
+* Modo overwrite para atualizações completas
+  
+## 🧑‍💻 ETL principal: processamento em SPARK/SQL (EM DEV)
+
